@@ -12,6 +12,7 @@ import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.example.basiclist.model.School
 import com.google.android.material.snackbar.Snackbar
+import com.squareup.picasso.Picasso
 
 class SchoolAdapter(private val context: Context, var arrayList: ArrayList<School>) : BaseAdapter() {
     private lateinit var image: ImageView
@@ -36,14 +37,22 @@ class SchoolAdapter(private val context: Context, var arrayList: ArrayList<Schoo
         Glide.with(context)
             .load(arrayList[position].logo_url_thumbnail)
             .into(image)
+
+//        Picasso.get().load(arrayList[position].logo_url_thumbnail).into(image)
+
         view.setOnClickListener {
-            Toast.makeText(context, arrayList[position].district,Toast.LENGTH_SHORT).show()
-            Snackbar.make(view, arrayList[position].district, Snackbar.LENGTH_SHORT).show()
-            AlertDialog.Builder(context)
-                .setTitle("Name of the school")
-                .setMessage(arrayList[position].district)
-                .setPositiveButton(android.R.string.ok, null)
-                .show()
+
+//            Toast.makeText(context, arrayList[position].district,Toast.LENGTH_SHORT).show()
+
+//            Snackbar.make(view, arrayList[position].district, Snackbar.LENGTH_SHORT).show()
+
+//            AlertDialog.Builder(context)
+//                .setTitle("Name of the school")
+//                .setMessage(arrayList[position].district)
+//                .setPositiveButton(android.R.string.ok, null)
+//                .show()
+
+            SchoolDialogFragment(arrayList[position]).show((context as MainActivity).supportFragmentManager, "dialog")
         }
         return view
     }
