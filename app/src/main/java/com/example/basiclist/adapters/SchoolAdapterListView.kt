@@ -1,6 +1,5 @@
-package com.example.basiclist
+package com.example.basiclist.adapters
 
-import android.app.AlertDialog
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
@@ -8,18 +7,18 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import com.bumptech.glide.Glide
+import com.example.basiclist.MainActivity
+import com.example.basiclist.R
+import com.example.basiclist.SchoolDialogFragment
 import com.example.basiclist.model.School
-import com.google.android.material.snackbar.Snackbar
-import com.squareup.picasso.Picasso
 
-class SchoolAdapter(private val context: Context, var arrayList: ArrayList<School>) : BaseAdapter() {
+class SchoolAdapterListView(private val context: Context, var schoolList: ArrayList<School>) : BaseAdapter() {
     private lateinit var image: ImageView
     private lateinit var name: TextView
     private lateinit var location: TextView
     override fun getCount(): Int {
-        return arrayList.size
+        return schoolList.size
     }
     override fun getItem(position: Int): Any {
         return position
@@ -30,12 +29,12 @@ class SchoolAdapter(private val context: Context, var arrayList: ArrayList<Schoo
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View? {
         val view = LayoutInflater.from(context).inflate(R.layout.school_item, parent, false)
         name = view.findViewById(R.id.name)
-        name.text = arrayList[position].district
+        name.text = schoolList[position].district
         location = view.findViewById(R.id.location)
-        location.text = arrayList[position].state
+        location.text = schoolList[position].state
         image = view.findViewById(R.id.image)
         Glide.with(context)
-            .load(arrayList[position].logo_url_thumbnail)
+            .load(schoolList[position].logo_url_thumbnail)
             .into(image)
 
 //        Picasso.get().load(arrayList[position].logo_url_thumbnail).into(image)
@@ -52,7 +51,7 @@ class SchoolAdapter(private val context: Context, var arrayList: ArrayList<Schoo
 //                .setPositiveButton(android.R.string.ok, null)
 //                .show()
 
-            SchoolDialogFragment(arrayList[position]).show((context as MainActivity).supportFragmentManager, "dialog")
+            SchoolDialogFragment(schoolList[position]).show((context as MainActivity).supportFragmentManager, "dialog")
         }
         return view
     }

@@ -26,10 +26,15 @@
         app:iconifiedByDefault="false"
         app:searchIcon="@drawable/ic_search"/>
 
-    <ListView
-        android:id="@+id/list_view"
-        android:divider="@null"
-        android:dividerHeight="0dp"
+<!--    <ListView-->
+<!--        android:id="@+id/list_view"-->
+<!--        android:divider="@null"-->
+<!--        android:dividerHeight="0dp"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content" />-->
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 </LinearLayout>

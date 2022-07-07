@@ -2,15 +2,19 @@ package com.example.basiclist
 
 import android.os.AsyncTask
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.android.volley.Request
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.example.basiclist.Constants.FULL_URL
+import com.example.basiclist.adapters.SchoolAdapterListView
+import com.example.basiclist.adapters.SchoolAdapterRecyclerView
 import com.example.basiclist.connection.HttpUrlConnection
 import com.example.basiclist.connection.RetrofitConfig
 import com.example.basiclist.databinding.FragmentFirstBinding
@@ -128,8 +132,13 @@ class FirstFragment : Fragment() {
 
     fun loadUI(schools: Map<String, School>) {
         val schoolList = schools.map { it.value }
-        val adapter = SchoolAdapter(requireContext(), schoolList as ArrayList<School>)
-        binding.listView.adapter = adapter
+//        val adapter = SchoolAdapterListView(requireContext(), schoolList as ArrayList<School>)
+//        binding.listView.adapter = adapter
+
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext());
+        val adapter = SchoolAdapterRecyclerView(schoolList)
+        binding.recyclerView.adapter = adapter
+
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 return false
@@ -138,9 +147,9 @@ class FirstFragment : Fragment() {
             override fun onQueryTextChange(newText: String?): Boolean {
                 if (!newText.isNullOrEmpty()) {
                     val filteredSchools = schoolList.filter { it.district.lowercase().contains(newText.lowercase()) }
-                    adapter.arrayList = filteredSchools as ArrayList<School>
+                    adapter.schoolList = filteredSchools as ArrayList<School>
                 } else {
-                    adapter.arrayList = schoolList
+                    adapter.schoolList = schoolList
                 }
                 adapter.notifyDataSetChanged()
                 return false
