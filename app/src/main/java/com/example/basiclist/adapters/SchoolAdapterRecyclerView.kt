@@ -1,6 +1,7 @@
 package com.example.basiclist.adapters
 
 import android.graphics.Bitmap
+import android.os.AsyncTask
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,7 +39,7 @@ class SchoolAdapterRecyclerView (var schoolList: List<School>) : RecyclerView.Ad
                     desiredHeight = 100,
                     desiredWidth = 100,
                     context = itemView.context
-                ).execute(school.logo_url_thumbnail)
+                ).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, school.logo_url_thumbnail)
             }
             name.text = school.district
             location.text = school.state
