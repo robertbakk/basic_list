@@ -1,17 +1,16 @@
 package com.example.basiclist.cache
 
+import android.content.Context
 import android.graphics.Bitmap
+import android.os.AsyncTask
 import android.util.LruCache
-import com.bumptech.glide.disklrucache.DiskLruCache
 import java.util.concurrent.locks.Condition
 import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
-class ImagesCache {
+class ImagesCache(val context: Context) {
 
     private lateinit var cachedImages: LruCache<String, Bitmap>
-    private val DISK_CACHE_SIZE = 1024 * 1024 * 10 // 10MB
-    private val DISK_CACHE_SUBDIR = "thumbnails"
-
     private var diskLruCache: DiskLruCache? = null
     private val diskCacheLock = ReentrantLock()
     private val diskCacheLockCondition: Condition = diskCacheLock.newCondition()
@@ -26,23 +25,52 @@ class ImagesCache {
                 return value.byteCount / 1024
             }
         }
-    }
 
-    fun addImageToCache(key: String?, value: Bitmap?) {
-        if (cachedImages.get(key) == null) {
-            cachedImages.put(key, value)
+        diskCacheLock.withLock {
+            diskLruCache = DiskLruCache(context, "cache", DiskLruCacheUtils.DISK_CACHE_SIZE, Bitmap.CompressFormat.PNG, 70)
+            diskCacheStarting = false
+            diskCacheLockCondition.signalAll()
         }
     }
 
-    fun getImageFromCache(key: String?): Bitmap? {
+    fun addImageToCache(url: String, value: Bitmap) {
+        val key = url.split("token=")[1]
+        if (cachedImages.get(key) == null) {
+            cachedImages.put(key, value)
+        }
+        synchronized(diskCacheLock) {
+            diskLruCache?.apply {
+                if (!containsKey(key)) {
+                    put(key, value)
+                }
+            }
+        }
+    }
+
+    private fun getBitmapFromDiskCache(key: String): Bitmap? =
+        diskCacheLock.withLock {
+            while (diskCacheStarting) {
+                try {
+                    diskCacheLockCondition.await()
+                } catch (e: InterruptedException) {
+
+                }
+
+            }
+            return diskLruCache?.getBitmap(key)
+        }
+
+
+    fun getImageFromCache(url: String?): Bitmap? {
+        val key = url?.split("token=")?.get(1)
         return if (key != null) {
-            cachedImages.get(key)
+            cachedImages.get(key) ?: getBitmapFromDiskCache(key)
         } else {
             null
         }
     }
 
-    fun removeImageFroCmCache(key: String?) {
+    fun removeImageFromCache(key: String?) {
         cachedImages.remove(key)
     }
 
@@ -52,12 +80,18 @@ class ImagesCache {
 
     companion object {
         private var cache: ImagesCache? = null
-        val instance: ImagesCache
-            get() {
-                if (cache == null) {
-                    cache = ImagesCache()
-                }
-                return cache!!
+
+        private fun init(context: Context): ImagesCache {
+            if (cache == null) {
+                cache = ImagesCache(context)
+            }
+            return cache!!
+        }
+
+        fun getInstance(context: Context): ImagesCache =
+            cache ?: synchronized(this) {
+                cache ?: init(context)
             }
     }
+
 }

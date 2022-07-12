@@ -13,7 +13,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val cache: ImagesCache = ImagesCache.instance
+        val cache: ImagesCache = ImagesCache.getInstance(this)
         cache.initializeCache()
 
         binding = ActivityMainBinding.inflate(layoutInflater)

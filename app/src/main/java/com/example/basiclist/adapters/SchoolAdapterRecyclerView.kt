@@ -26,19 +26,19 @@ class SchoolAdapterRecyclerView (var schoolList: List<School>) : RecyclerView.Ad
 
 
         fun bind (school: School, adapter: SchoolAdapterRecyclerView) {
-            val cache: ImagesCache = ImagesCache.instance
+            val cache: ImagesCache = ImagesCache.getInstance(itemView.context)
             val bm: Bitmap? = cache.getImageFromCache(school.logo_url_thumbnail)
 
             if (bm != null) {
                 image.setImageBitmap(bm)
             } else {
                 image.setImageBitmap(null)
-                val imgTask = DownloadImageTask(
+                DownloadImageTask(
                     adapter =  adapter,
-                    desiredHeight = 300,
-                    desiredWidth = 300,
-                )
-                imgTask.execute(school.logo_url_thumbnail)
+                    desiredHeight = 100,
+                    desiredWidth = 100,
+                    context = itemView.context
+                ).execute(school.logo_url_thumbnail)
             }
             name.text = school.district
             location.text = school.state
